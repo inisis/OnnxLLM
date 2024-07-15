@@ -35,6 +35,7 @@ pip install .
 from transformers import AutoTokenizer
 from onnxllm import AutoModelForCausalLM
 
+# you should download onnx models from https://huggingface.co/inisis-me first
 tokenizer = AutoTokenizer.from_pretrained("/data/llm/llm-export/onnx-standard/", trust_remote_code=True)
 model = AutoModelForCausalLM.from_pretrained("/data/llm/llm-export/onnx-standard/", trust_remote_code=True)
 
