@@ -68,6 +68,7 @@ class QwenForCausalLM(OnnxLLMForCausalLM):
         past_key_values = [np.zeros(self.past_kv_shape, dtype=np.float32) for i in range(self.block_nums)]
         token_id = input_ids
         res = ''
+        if stream: print(query, end="", flush=True)
         while self.token_len < self.max_length:
             attention_mask = self.get_attention_mask()
             position_ids = self.get_position_ids()
