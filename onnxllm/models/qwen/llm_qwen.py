@@ -1,5 +1,6 @@
 import os
 import numpy as np
+from tqdm import tqdm
 from onnxllm.models.auto_factory import OnnxLLMForCausalLM
 
 
@@ -12,11 +13,21 @@ class QwenForCausalLM(OnnxLLMForCausalLM):
 
     def load(self, model_path):
         self.block_nums = self.config.num_hidden_layers
-        self.lm = self.load_module(os.path.join(model_path, 'lm.onnx'))
-        self.embed = self.load_module(os.path.join(model_path, 'embedding.onnx'))
+        total_modules = self.config.num_hidden_layers + 2
+
         self.blocks = []
-        for i in range(self.block_nums):
-            self.blocks.append(self.load_module(os.path.join(model_path, f'block_{i}.onnx')))
+
+        with tqdm(total=total_modules, desc="Loading model shards") as pbar:
+            self.lm = self.load_module(os.path.join(model_path, 'lm.onnx'))
+            pbar.update(1)
+
+            self.embed = self.load_module(os.path.join(model_path, 'embedding.onnx'))
+            pbar.update(1)
+
+            for i in range(self.block_nums):
+                block_path = os.path.join(model_path, f'block_{i}.onnx')
+                self.blocks.append(self.load_module(block_path))
+                pbar.update(1)
 
     def get_attention_mask(self):
         if self.token_len:
