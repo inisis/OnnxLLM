@@ -300,8 +300,6 @@ class SmoothQuantProcessor():
         for j in range(num_batches):
             layer_input = layer_inputs[j]
             output = layer(layer_input, **self.module_kwargs)
-            torch.onnx.export(layer, (layer_input, self.module_kwargs), "llama.onnx", dynamo=True, opset_version=23)
-            raise
             if isinstance(output, tuple):
                 layer_output = output[0]
             elif isinstance(output, torch.Tensor):
